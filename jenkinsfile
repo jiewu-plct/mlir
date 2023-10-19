@@ -1,0 +1,20 @@
+node("x86_runner1"){
+    stage('*** Cleanup***') {
+        cleanWs()
+    }
+    stage('*** Check out SCM ***') { 
+        dir('llvm-project') {
+            git branch: 'main', url: 'https://github.com/llvm/llvm-project.git'
+        }
+    } 
+    stage('*** Compilation Phase adn Test***') { 
+        sh '''#!/bin/bash
+            pwd
+            ls
+            cd llvm-project
+            mkdir build && cd build
+            cmake -G Ninja ../llvm -DLLVM_PARALLEL_LINK_JOBS=3 -DLLVM_ENABLE_PROJECTS=mlir -DLLVM_BUILD_EXAMPLES=ON -DLLVM_TARGETS_TO_BUILD="X86;RISCV" -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_ASSERTIONS=ON
+            cmake --build . --target check-mlir
+         '''
+    }
+}
