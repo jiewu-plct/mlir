@@ -4,7 +4,12 @@ node("sf2-2"){
     }
     stage('*** Check out SCM ***') { 
         dir('llvm-project') {
-            git branch: 'main', url: 'https://github.com/llvm/llvm-project.git'
+            checkout([$class: 'GitSCM',
+                branches: [[name: 'main']],
+                extensions: [[$class: 'CloneOption', timeout: 300]],
+                gitTool: 'Default', 
+                userRemoteConfigs: [[url: 'https://github.com/llvm/llvm-project.git']]
+            ])
         }
     } 
     stage('*** Compilation Phase adn Test***') { 
